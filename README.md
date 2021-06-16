@@ -1,2 +1,2 @@
 # Argano-Contracts
-This is our smart-contracts that are situated on Polygon Mainnet
+Argano’s core smart contracts. Their test versions are already deployed on the Polygon mainnet
