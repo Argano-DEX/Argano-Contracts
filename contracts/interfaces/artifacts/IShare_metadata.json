@@ -1,0 +1,82 @@
+{
+	"compiler": {
+		"version": "0.8.4+commit.c7e474f2"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_address",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "poolBurnFrom",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_address",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "m_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "poolMint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"interfaces/IShare.sol": "IShare"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"interfaces/IShare.sol": {
+			"keccak256": "0x112559c2399c857d415585c486fda6bbcf8b8bae9b17435201085bd53f7d9aff",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://cdac7e50ed2394df33a5aca45cc53e670d1b875c723b50d614b8f0518236aafe",
+				"dweb:/ipfs/QmXWFtGZZLwEdE11Pkee6Jag7kFAw2NMhm7FjpyNvu76Vk"
+			]
+		}
+	},
+	"version": 1
+}

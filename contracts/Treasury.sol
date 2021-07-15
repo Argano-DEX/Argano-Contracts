@@ -20,8 +20,8 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     address public oracleShare;
     address public oracleGovToken;
 
-    address public AGOUSD;
-    address public CNUSD;
+    address public dollar;
+    address public share;
     address public governanceToken;
 
     address public strategist;
@@ -46,7 +46,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     uint256 public effective_collateral_ratio = 1000000; // = 100% - fully collateralized at start; // 6 decimals of precision
     uint256 public refresh_cooldown = 3600; // Refresh cooldown period is set to 1 hour (3600 seconds) at genesis; // Seconds to wait before being able to run refreshCollateralRatio() again
     uint256 public ratio_step = 2500; // Amount to change the collateralization ratio by upon refreshCollateralRatio() // = 0.25% at 6 decimals of precision
-    uint256 public price_target = 1000000; // = $1. (6 decimals of precision). Collateral ratio will adjust according to the $1 price target at genesis; // The price of Dollar at which the collateral ratio will respond to; this value is only used for the collateral ratio mechanism and not for minting and redeeming which are hardcoded at $1
+    uint256 public price_target = 1000000; // = $1. (6 decimals of precision). Collateral ratio will adjust according to the $1 price target at genesis; // The price of dollar at which the collateral ratio will respond to; this value is only used for the collateral ratio mechanism and not for minting and redeeming which are hardcoded at $1
     uint256 public price_band = 5000; // The bound above and below the price target at which the Collateral ratio is allowed to drop
     uint256 public gov_token_value_for_discount = 1000;//1000$ in governance tokens
     uint256 private constant COLLATERAL_RATIO_MAX = 1e6;
@@ -61,8 +61,8 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
 
     // uniswap
     address public uniswap_router;
-    address public uniswap_pair_WMATIC_COLLATERALL;
-    address public uniswap_pair_SHARE_WMATIC;
+    address public uniswap_pair_WCOIN_COLLATERALL;
+    address public uniswap_pair_SHARE_WCOIN;
 
     // foundry
     bool public initialized = false;
@@ -76,12 +76,14 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     /* ========== MODIFIERS ========== */
 
     modifier onlyStrategist() {
-        require(strategist == msg.sender, "!strategist");
+        require(strategist == _msgSender(), "!strategist");
         _;
     }
 
     modifier onlyStrategistOrOwner() {
-        require(strategist == msg.sender || owner == msg.sender, "!strategist&&!owner");
+        require(strategist == _msgSender() 
+        || owner() == _msgSender(), 
+        "not strategist and not owner");
         _;
     }
 
@@ -93,12 +95,6 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     modifier hasRebalancePool() {
         require(rebalancing_pool != address(0), "!rebalancingPool");
         require(rebalancing_pool_collateral != address(0), "!rebalancingPoolCollateral");
-        _;
-    }
-
-    modifier checkCondition {
-        require(!migrated, "Treasury: migrated");
-        require(block.timestamp >= startTime, "Treasury: not started yet");
         _;
     }
 
@@ -156,9 +152,10 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         return _epoch;
     }
 
-    function redemption_fee_adjusted() public view returns (uint256) {
+    function redemption_fee_adjusted() public view returns (uint256 redemptionFee) {
         if (governanceToken == address(0)) return redemption_fee;
         if (IERC20(governanceToken).balanceOf(tx.origin) > discount_requirenment() ) return redemption_fee / 2;
+        return redemption_fee;
     }
 
     function discount_requirenment() public view returns (uint256) {
@@ -185,7 +182,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         return (
             dollarPrice(), 
             sharePrice(), 
-            IERC20(AGOUSD).totalSupply(), 
+            IERC20(dollar).totalSupply(), 
             target_collateral_ratio, 
             effective_collateral_ratio, 
             globalCollateralValue(),    
@@ -194,18 +191,18 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         );
     }
 
-    function epochInfo()
-        external
-        view
-        override
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
-        return (epoch(), nextEpochPoint(), epoch_length, excess_collateral_distributed_ratio);
+    function epochInfo() external view override returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ){
+        return (
+            epoch(), 
+            nextEpochPoint(), 
+            epoch_length, 
+            excess_collateral_distributed_ratio
+        );
     }
 
     // Iterate through all pools and calculate all value of collateral in all pools globally
@@ -221,19 +218,14 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     }
 
     function calcEffectiveCollateralRatio() public view returns (uint256) {
-        if (!using_effective_collateral_ratio) {
-            return target_collateral_ratio;
-        }
+        if (!using_effective_collateral_ratio) return target_collateral_ratio;
         uint256 total_collateral_value = globalCollateralValue();
-        uint256 total_supply_dollar = IERC20(AGOUSD).totalSupply();
+        uint256 total_supply_dollar = IERC20(dollar).totalSupply();
         uint256 ecr = total_collateral_value * PRICE_PRECISION / total_supply_dollar;
-        if (ecr > COLLATERAL_RATIO_MAX) {
-            return COLLATERAL_RATIO_MAX;
-        }
+        if (ecr > COLLATERAL_RATIO_MAX) return COLLATERAL_RATIO_MAX;
         return ecr;
     }
 
-    /* ========== PUBLIC FUNCTIONS ========== */
 
     function refreshCollateralRatio() public {
         require(collateral_ratio_paused == false, "Collateral Ratio has been paused");
@@ -243,18 +235,15 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
 
         // Step increments are 0.25% (upon genesis, changable by setRatioStep())
         if (current_dollar_price > price_target + price_band ) {
-            // decrease collateral ratio
-            if (target_collateral_ratio <= ratio_step) {
-                // if within a step of 0, go to 0
-                target_collateral_ratio = 0;
+            if (target_collateral_ratio <= ratio_step) {// decrease collateral ratio
+                target_collateral_ratio = 0;// if within a step of 0, go to 0
             } else {
                 target_collateral_ratio = target_collateral_ratio - ratio_step;
             }
         }
-        // IRON price is below $1 - `price_band`. Need to increase `collateral_ratio`
+        // Dollar price is below $1 - `price_band`. Need to increase `collateral_ratio`
         else if (current_dollar_price < price_target - price_band) {
-            // increase collateral ratio
-            if (target_collateral_ratio + ratio_step >= COLLATERAL_RATIO_MAX) {
+            if (target_collateral_ratio + ratio_step >= COLLATERAL_RATIO_MAX) { // increase collateral ratio
                 target_collateral_ratio = COLLATERAL_RATIO_MAX; // cap collateral ratio at 1.000000
             } else {
                 target_collateral_ratio = target_collateral_ratio + ratio_step;
@@ -274,7 +263,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     // Check if the protocol is over- or under-collateralized, by how much
     function calcCollateralBalance() public view returns (uint256 _collateral_value, bool _exceeded) {
         uint256 total_collateral_value = globalCollateralValue();
-        uint256 target_collateral_value = IERC20(AGOUSD).totalSupply() * target_collateral_ratio / PRICE_PRECISION;
+        uint256 target_collateral_value = IERC20(dollar).totalSupply() * target_collateral_ratio / PRICE_PRECISION;
         if (total_collateral_value >= target_collateral_value) {
             _collateral_value = total_collateral_value - target_collateral_value;
             _exceeded = true;
@@ -292,15 +281,15 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         uint256 _input_amount,
         uint256 _min_output_amount
     ) internal returns (uint256) {
-        require(uniswap_router != address(0) && uniswap_pair_SHARE_WMATIC != address(0) && uniswap_pair_WMATIC_COLLATERALL != address(0), "!quickswap");
+        require(uniswap_router != address(0) && uniswap_pair_SHARE_WCOIN != address(0) && uniswap_pair_WCOIN_COLLATERALL != address(0), "!quickswap");
         if (_input_amount == 0) return 0;
         address[] memory _path = new address[](2);
-        if (_input_token == CNUSD) {
-            _path[0] = uniswap_pair_SHARE_WMATIC;
-            _path[1] = uniswap_pair_WMATIC_COLLATERALL;
+        if (_input_token == share) {
+            _path[0] = uniswap_pair_SHARE_WCOIN;
+            _path[1] = uniswap_pair_WCOIN_COLLATERALL;
         } else {
-            _path[0] = uniswap_pair_WMATIC_COLLATERALL;
-            _path[1] = uniswap_pair_SHARE_WMATIC;
+            _path[0] = uniswap_pair_WCOIN_COLLATERALL;
+            _path[1] = uniswap_pair_SHARE_WCOIN;
         }
         IERC20(_input_token).safeApprove(uniswap_router, 0);
         IERC20(_input_token).safeApprove(uniswap_router, _input_amount);
@@ -350,9 +339,9 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         (uint256 _deficit_collateral_value, bool _exceeded) = calcCollateralBalance();
         require(!_exceeded && _deficit_collateral_value > 0, "exceeded");
         require(_min_collateral_amount <= _deficit_collateral_value, ">deficit");
-        uint256 _share_balance = IERC20(CNUSD).balanceOf(address(this));
+        uint256 _share_balance = IERC20(share).balanceOf(address(this));
         require(_share_amount <= _share_balance, ">shareBalance");
-        uint256 out_collateral_amount = _swap(CNUSD, _share_amount, _min_collateral_amount);
+        uint256 out_collateral_amount = _swap(share, _share_amount, _min_collateral_amount);
         uint256 _collateral_balance = IERC20(rebalancing_pool_collateral).balanceOf(address(this));
         if (_collateral_balance > 0) {
             IERC20(rebalancing_pool_collateral).safeTransfer(rebalancing_pool, _collateral_balance); // Transfer collateral from Treasury to Pool
@@ -362,7 +351,9 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         emit Recollateralized(_share_amount, out_collateral_amount, out_collateral_value);
     }
 
-    function allocateSeigniorage() external nonReentrant checkCondition checkEpoch {
+    function allocateSeigniorage() external nonReentrant checkEpoch {
+        require(!migrated, "Treasury: migrated");
+        require(block.timestamp >= startTime, "Treasury: not started yet");
         (uint256 _excess_collateral_value, bool _exceeded) = calcCollateralBalance();
         uint256 _allocation_value = 0;
         if (_exceeded) {
@@ -378,9 +369,9 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
 
     function migrate(address _new_treasury) external onlyOwner notMigrated {
         migrated = true;
-        uint256 _share_balance = IERC20(CNUSD).balanceOf(address(this));
+        uint256 _share_balance = IERC20(share).balanceOf(address(this));
         if (_share_balance > 0) {
-            IERC20(CNUSD).safeTransfer(_new_treasury, _share_balance);
+            IERC20(share).safeTransfer(_new_treasury, _share_balance);
         }
         if (rebalancing_pool_collateral != address(0)) {
             uint256 _collateral_balance = IERC20(rebalancing_pool_collateral).balanceOf(address(this));
@@ -438,12 +429,12 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         oracleGovToken = _oracleGovToken;
     }
 
-    function setDollarAddress(address _AGOUSD) public onlyOwner {
-        AGOUSD = _AGOUSD;
+    function setDollarAddress(address _Dollar) public onlyOwner {
+        dollar = _Dollar;
     }
 
-    function setShareAddress(address _CNUSD) public onlyOwner {
-        CNUSD = _CNUSD;
+    function setShareAddress(address _Share) public onlyOwner {
+        share = _Share;
     }
 
     function setGovTokenAddress(address _governanceToken) public onlyOwner {
@@ -456,12 +447,12 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
 
     function setUniswapParams(
         address _uniswap_router,
-        address _uniswap_pair_CNUSD_WMATIC,
-        address _uniswap_pair_WMATIC_USDT
+        address _uniswap_pair_Share_Wcoin,
+        address _uniswap_pair_Wcoin_Collateral
     ) public onlyOwner {
         uniswap_router = _uniswap_router;
-        uniswap_pair_SHARE_WMATIC = _uniswap_pair_CNUSD_WMATIC;
-        uniswap_pair_WMATIC_COLLATERALL = _uniswap_pair_WMATIC_USDT;
+        uniswap_pair_SHARE_WCOIN = _uniswap_pair_Share_Wcoin;
+        uniswap_pair_WCOIN_COLLATERALL = _uniswap_pair_Wcoin_Collateral;
     }
 
     function setRebalancePool(address _rebalance_pool) public onlyOwner {

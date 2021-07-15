@@ -1,0 +1,70 @@
+{
+	"compiler": {
+		"version": "0.8.4+commit.c7e474f2"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "tokenIn",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "tokenOut",
+						"type": "address"
+					}
+				],
+				"name": "getSpotPriceSansFee",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "spotPrice",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"interfaces/IValuePool.sol": "IValuePool"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"interfaces/IValuePool.sol": {
+			"keccak256": "0x76fa1dd08cc7fd6c07c8ed293a1a0753555796bf881f9bceaef8cadba07513e0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b17a9f85c9ee3ac52eac08b6eac846157512ffabdaaa6382f4ec2285394dd70b",
+				"dweb:/ipfs/QmXUCv3M5xd1rTosL339t47NXosvR6pM3bTmuPTMEMikzL"
+			]
+		}
+	},
+	"version": 1
+}

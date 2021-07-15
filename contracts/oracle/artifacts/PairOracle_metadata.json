@@ -1,0 +1,344 @@
+{
+	"compiler": {
+		"version": "0.8.4+commit.c7e474f2"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "pairAddress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "PERIOD",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "blockTimestampLast",
+				"outputs": [
+					{
+						"internalType": "uint32",
+						"name": "",
+						"type": "uint32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountIn",
+						"type": "uint256"
+					}
+				],
+				"name": "consult",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "amountOut",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pair",
+				"outputs": [
+					{
+						"internalType": "contract IUniswapLP",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "price0Average",
+				"outputs": [
+					{
+						"internalType": "uint224",
+						"name": "_x",
+						"type": "uint224"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "price0CumulativeLast",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "price1Average",
+				"outputs": [
+					{
+						"internalType": "uint224",
+						"name": "_x",
+						"type": "uint224"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "price1CumulativeLast",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_period",
+						"type": "uint256"
+					}
+				],
+				"name": "setPeriod",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "token0",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "token1",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "update",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"oracle/PairOracle.sol": "PairOracle"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0x6bb804a310218875e89d12c053e94a13a4607cdf7cc2052f3e52bd32a0dc50a1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b2ebbbe6d0011175bd9e7268b83de3f9c2f9d8d4cbfbaef12aff977d7d727163",
+				"dweb:/ipfs/Qmd5c7Vxtis9wzkDNhxwc6A2QT5H9xn9kfjhx7qx44vpro"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x95098bd1d9c8dec4d80d3dedb88a0d949fa0d740ee99f2aa466bc308216ca6d5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7fec968dcd68e13961521fa3c7dd87baecad91a2653b19240e81f21cc4f3ba85",
+				"dweb:/ipfs/QmaXtsYt4Mphm8XHNUfk2me1cF3ssS2SqDBNFpYAzMjomC"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0x8666f020bd8fc9dc14f07e2ebc52b5f236ab4cdde7c77679b08cb2f94730043b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://163776cbf565c722232393aa2d62cbe8a2ffb5805986abf4906c00e1e07450a6",
+				"dweb:/ipfs/QmPZoN9T3cb6o8bGhjBPZcz7im8T8DWhpr3tjLwhJJHx9N"
+			]
+		},
+		"interfaces/IPairOracle.sol": {
+			"keccak256": "0x98e2cce875f11fad9bf4c0cecee7830116207fc89364a10115f74114c30864c1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://61728a8620bdfde0d3156a735f0f155d807f1e91820a8f3efbc2a9cec5053ad9",
+				"dweb:/ipfs/QmW7R4c1MazrVFKBcMvCgZbctpppYr82Wg2FrtPQgtGj6D"
+			]
+		},
+		"interfaces/IUniswapLP.sol": {
+			"keccak256": "0xf358cbe152b1c8450b572e190b055cb3aae97a79444f2beaea52d3becd4d3d6d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b73aba5b06d17e485eb3eab002e7dea4a9a183c69a5086c1bde0fee83c0eefc3",
+				"dweb:/ipfs/QmRs4KtZs5Qwk2Lm3GLCmYLDYUeghvGVNk7AAjCpw3SNtM"
+			]
+		},
+		"libs/Babylonian.sol": {
+			"keccak256": "0xe74f527cbb24bd12fcb35e40e6d6d9bfdffe4c6b663ecaad9ae24be586324688",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://54244b1621ec0397390a4a470373c409e46d25fbcac8ab71a296277847cda627",
+				"dweb:/ipfs/Qmd4xKXTMKXRKPdwxy7mapFZpgoQjAXYyxR471dSCj7cpB"
+			]
+		},
+		"libs/FixedPoint.sol": {
+			"keccak256": "0x4b30937831fc1537427760951560acc45422fec3150d3679de253c8738c2f3ee",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://28d7c54599acc018c227c807033cbab2d3cc01f8b7b40517bcd274c0cb1f1973",
+				"dweb:/ipfs/QmWgJYBTGRKp1YNuYNpQgZzXiprcEVtW5A4amqqV416nPh"
+			]
+		},
+		"libs/UQ112x112.sol": {
+			"keccak256": "0x5b5a75cc0fa900ef33e70ef46e896d7dd4937bc05828991b55ac6fa85b81eaad",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ac5c382e93de944f9a9a30e547bfbcd59e8def938fb88a866f22cc6076f1e667",
+				"dweb:/ipfs/Qmc8h2nxt5FthDfyPFTEpRCgvjsVzyZwtEkJsRr6fvNT58"
+			]
+		},
+		"oracle/PairOracle.sol": {
+			"keccak256": "0x59f55d5d32f67169d084d7c7b490184de3c668b8fe2cbe274500b2c3f60f4022",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6ea4f13ce48bbb27c3a1d089f8f475ad655215fd92dd29c5636c9061defba9c3",
+				"dweb:/ipfs/QmdntLZVN23Srnyzt5W64jRJyEFmxMZbtgtnmsbTn5EoYo"
+			]
+		}
+	},
+	"version": 1
+}

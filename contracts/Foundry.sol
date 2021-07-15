@@ -4,7 +4,6 @@ pragma solidity 0.8.4;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IOracle.sol";
@@ -15,8 +14,6 @@ import "./utilityContracts/ShareWrapper.sol";
 contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
     using Address for address;
-
-    /* ========== DATA STRUCTURES ========== */
 
     struct FoundryPosition {
         uint256 lastSnapshotIndex;
@@ -30,8 +27,6 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
         uint256 rewardPerShare;
     }
 
-    /* ========== STATE VARIABLES ========== */
-
     // flags
     bool public initialized = false;
 
@@ -41,18 +36,13 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
 
     mapping(address => FoundryPosition) public blacksmiths;
     FoundrySnapshot[] public foundryHistory;
-
     uint256 public withdrawLockupEpochs;
-
-    /* ========== EVENTS ========== */
 
     event Initialized(address indexed executor, uint256 at);
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 reward);
     event RewardAdded(address indexed user, uint256 reward);
-
-    /* ========== Modifiers =============== */
 
     modifier updateReward(address blacksmith) {
         if (blacksmith != address(0)) {
@@ -150,7 +140,6 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
     function earned(address blacksmith) public view returns (uint256) {
         uint256 latestRPS = getLatestSnapshot().rewardPerShare;
         uint256 storedRPS = getLastSnapshotOf(blacksmith).rewardPerShare;
-
         return balanceOf(blacksmith) * (latestRPS - storedRPS) / 1e18 + (blacksmiths[blacksmith].rewardEarned);
     }
 
