@@ -28,8 +28,6 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
     }
 
     // flags
-    bool public initialized = false;
-
     address public collateral;
     address public treasury;
     address public oracle; // oracle to get price of collateral
@@ -54,11 +52,6 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
         _;
     }
 
-    modifier notInitialized {
-        require(!initialized, "Foundry: already initialized");
-        _;
-    }
-
     modifier onlyTreasury() {
         require(msg.sender == address(treasury), "!treasury");
         _;
@@ -66,7 +59,7 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
 
     /* ========== GOVERNANCE ========== */
 
-    function initialize(address _collateral, address _share, address _treasury) public notInitialized {
+    constructor (address _collateral, address _share, address _treasury){
         collateral = _collateral;
         share = _share;
         treasury = _treasury;
@@ -74,8 +67,6 @@ contract Foundry is ShareWrapper, ReentrancyGuard, Ownable {
         FoundrySnapshot memory genesisSnapshot = FoundrySnapshot({time: block.number, rewardReceived: 0, rewardPerShare: 0});
         foundryHistory.push(genesisSnapshot);
         withdrawLockupEpochs = 8; // Lock for 8 epochs before release withdraw
-        initialized = true;
-        emit Initialized(msg.sender, block.number);
     }
 
     function setLockUp(uint256 _withdrawLockupEpochs) external onlyOwner {

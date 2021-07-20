@@ -54,6 +54,7 @@ contract Pool is Ownable, ReentrancyGuard, IPool {
     bool public migrated = false;
 
     /* ========== MODIFIERS ========== */
+    
 
     modifier notMigrated() {
         require(!migrated, "migrated");
@@ -81,7 +82,7 @@ contract Pool is Ownable, ReentrancyGuard, IPool {
         governanceToken = _governanceToken;
         treasury = _treasury;
         pool_ceiling = _pool_ceiling;
-        missing_decimals = uint256(18) - IERC20Metadata(_collateral).decimals();
+        missing_decimals = uint256(18) - IERC20Metadata(_collateral).decimals();//only tokens with 18 decimals or less is desired
     }
 
     /* ========== VIEWS ========== */
@@ -132,6 +133,7 @@ contract Pool is Ownable, ReentrancyGuard, IPool {
         uint256 _dollar_out_min
     ) external notMigrated {
         require(mint_paused == false, "Minting is paused");
+        ITreasury(treasury).updateOracles();
         (, uint256 _share_price, , uint256 _target_collateral_ratio, , , uint256 _minting_fee, ) = ITreasury(treasury).info();
         require(ERC20(collateral).balanceOf(address(this)) - (unclaimed_pool_collateral) + (_collateral_amount) <= pool_ceiling, ">poolCeiling");
         uint256 _price_collateral = getCollateralPrice();
@@ -167,6 +169,7 @@ contract Pool is Ownable, ReentrancyGuard, IPool {
     ) external notMigrated {
         require(redeem_paused == false, "Redeeming is paused");
         require((last_redeemed[msg.sender] + (redemption_delay)) <= block.number, "<redemption_delay");
+        ITreasury(treasury).updateOracles();
         (, uint256 _share_price, , , uint256 _effective_collateral_ratio, , , uint256 _redemption_fee) = ITreasury(treasury).info();
         uint256 _collateral_price = getCollateralPrice();
         uint256 _dollar_amount_post_fee = _dollar_amount - ((_dollar_amount * (_redemption_fee)) / (PRICE_PRECISION));
@@ -210,6 +213,8 @@ contract Pool is Ownable, ReentrancyGuard, IPool {
         // Redeem and Collect cannot happen in the same transaction to avoid flash loan attack
         require((last_redeemed[msg.sender] + (collect_redemption_delay)) <= block.number, "<collect_redemption_delay");
 
+        ITreasury(treasury).updateOracles();
+        
         bool _send_share = false;
         bool _send_collateral = false;
         uint256 _share_amount;

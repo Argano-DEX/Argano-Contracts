@@ -13,7 +13,7 @@
 						"type": "address"
 					},
 					{
-						"internalType": "address",
+						"internalType": "contract IPairOracle",
 						"name": "_oracleCustomTokenCollateral",
 						"type": "address"
 					},
@@ -155,6 +155,13 @@
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "updateIfRequiered",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -188,7 +195,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
@@ -218,12 +225,28 @@
 				"dweb:/ipfs/QmaXtsYt4Mphm8XHNUfk2me1cF3ssS2SqDBNFpYAzMjomC"
 			]
 		},
-		"oracle/CustomTokenOracle.sol": {
-			"keccak256": "0xd8963fa41af5ebe637aa1d5c65ef5e335d7b618c9f84a99f2abc3b6795377a7d",
+		"interfaces/IOracle.sol": {
+			"keccak256": "0x72ebadfb7e1015776f3116be441f68a14956bf895630d0873d3a13eaea26bc48",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://10bce84c90007fb4319a9f2a242a62d68c55a468d1610c9e1d12b6a2c6a4cc06",
-				"dweb:/ipfs/QmNXNmzNdwm9W7uC1Boomvr4ZHnCpwykVwYkNwL2mgDSAG"
+				"bzz-raw://4d80fca91421f0a35b3093bc3a812d93bcf2fda7d75a35af42d3664a2392650e",
+				"dweb:/ipfs/QmYPrdV5GM2urksrwAMYbNasKCbL5TnZh3KvTStt9UKFhp"
+			]
+		},
+		"interfaces/IPairOracle.sol": {
+			"keccak256": "0x452177c334a5162acdc3f9e7ba99f340e6914b748d46d851e30ca9b717111094",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5d8a5c0abbe1a5e457e62a6c10ed2804affbb5fcbff47657303dd05c9465882c",
+				"dweb:/ipfs/QmUTz8WM9FHD3VKahSR7AEypQufEqLtjLU3Lf6LNJuq1U2"
+			]
+		},
+		"oracle/CustomTokenOracle.sol": {
+			"keccak256": "0xc37c1fb7fcb8c6b63c289b3df235b9ae94e08fc859d6582a96f0dab9bd383a2e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9c401cc2f5ccf956edb37c0714f594b7e89eca670075773a0f53251842dde89c",
+				"dweb:/ipfs/QmWBWxYCS2fmugt2f41ExDiBmXSQrzDARuoc3xWbrA8XUS"
 			]
 		}
 	},

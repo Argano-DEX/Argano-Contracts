@@ -50,7 +50,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"oracle/PairOracle.sol": "IPairOracle"
+			"oracle/CustomTokenOracle.sol": "IPairOracle"
 		},
 		"evmVersion": "istanbul",
 		"libraries": {},
@@ -58,12 +58,20 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
 	},
 	"sources": {
+		"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+			"keccak256": "0xe6f5ac8c47f3b9b6135051efb9216f9ba5b312a6ecc20209b4f66a780443c328",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ded4aa77b7b8f222a2d992eb95b03592be3250b826b6a38a4c790d2dec8b0d47",
+				"dweb:/ipfs/QmNUKpTKXWsBBNMyzZuYvEZ2pUhZ2zEhQuyvxYZpTwo4eT"
+			]
+		},
 		"@openzeppelin/contracts/access/Ownable.sol": {
 			"keccak256": "0x6bb804a310218875e89d12c053e94a13a4607cdf7cc2052f3e52bd32a0dc50a1",
 			"license": "MIT",
@@ -80,12 +88,12 @@
 				"dweb:/ipfs/QmaXtsYt4Mphm8XHNUfk2me1cF3ssS2SqDBNFpYAzMjomC"
 			]
 		},
-		"oracle/PairOracle.sol": {
-			"keccak256": "0xf1dddeecdad656ac6788644a14f72197a198648ce311362220e5aeaf39b748c1",
+		"oracle/CustomTokenOracle.sol": {
+			"keccak256": "0xd8963fa41af5ebe637aa1d5c65ef5e335d7b618c9f84a99f2abc3b6795377a7d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://92adcff76367bb2823792387502f3061c5035c45d32c6409ddd47daa001883e3",
-				"dweb:/ipfs/QmStsuNKfaygcqUcwizJcnVJccPu8mrWJd8f7L7QpRzJdq"
+				"bzz-raw://10bce84c90007fb4319a9f2a242a62d68c55a468d1610c9e1d12b6a2c6a4cc06",
+				"dweb:/ipfs/QmNXNmzNdwm9W7uC1Boomvr4ZHnCpwykVwYkNwL2mgDSAG"
 			]
 		}
 	},

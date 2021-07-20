@@ -8,7 +8,8 @@ import "./interfaces/ITreasury.sol";
 
 contract Share is ERC20Capped, Ownable {
     address public treasury;
-    bool public initialized;
+    bool private genesisSupplyMinted = false;
+    uint256 public genesisSupply;
 
     address public rewardController; // Holding SHARE tokens to distribute into Liquiditiy Mining Pools
     uint256 public communityRewardAllocation;
@@ -27,29 +28,31 @@ contract Share is ERC20Capped, Ownable {
         string memory _name, 
         string memory _symbol, 
         uint256 _hardCap,
+        uint256 _genesisSupply,
         uint256 _communityRewardAllocation,
-        address _treasury
+        address _treasury,
+        address _rewardController
     )
         ERC20(_name, _symbol)
         ERC20Capped(_hardCap)
     {
+        require(_rewardController != address(0), "badRewardController");
+        rewardController = _rewardController;
         setTreasuryAddress(_treasury);
         communityRewardAllocation = _communityRewardAllocation;//80000000 ether; // 80M
+        genesisSupply = _genesisSupply;
     }
-
-
-    function initialize( address _rewardController, uint256 _genesisSupply) external onlyOwner {
-        require(!initialized, "alreadyInitialized");
-        require(_rewardController != address(0), "badRewardController");
-        initialized = true;
-        rewardController = _rewardController;
-        _mint(msg.sender, _genesisSupply);
+    
+    function mintGenesisSupply() external onlyOwner {
+        require(!genesisSupplyMinted, "genesisSupplyAlreadyMinted");
+        genesisSupplyMinted = true;
+        _mint(msg.sender, genesisSupply);// mint 1 time requiered amount for allocation
+        emit ShareMinted(address(this), msg.sender, genesisSupply);
     }
 
 
     function claimCommunityRewards(uint256 amount) external onlyOwner {
         require(amount > 0, "invalidAmount");
-        require(initialized, "!initialized");
         require(amount <= ( communityRewardAllocation - communityRewardClaimed ) , "exceedRewards");
         communityRewardClaimed = communityRewardClaimed + amount;
         _mint(rewardController, amount);
