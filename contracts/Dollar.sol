@@ -9,7 +9,8 @@ import "./interfaces/ITreasury.sol";
 
 contract Dollar is ERC20, IDollar, Ownable {
     address public treasury;
-    bool public initialized;
+    bool private genesisSupplyMinted = false;
+    uint256 public genesisSupply;
 
     modifier onlyPools() {
         require(ITreasury(treasury).hasPool(msg.sender), "!pools");
@@ -23,17 +24,21 @@ contract Dollar is ERC20, IDollar, Ownable {
     constructor(
         string memory _name,  
         string memory _symbol, 
-        address _treasury
+        address _treasury,
+        uint256 _genesisSupply
     )
         ERC20(_name, _symbol)
     {
         setTreasuryAddress(_treasury);
+        genesisSupply = _genesisSupply;
     }
-
-    function initialize(uint256 _genesis_supply) external onlyOwner {
-        require(!initialized, "alreadyInitialized");
-        initialized = true;
-        _mint(msg.sender, _genesis_supply);//for pool creations
+    
+        
+    function mintGenesisSupply() external onlyOwner {
+        require(!genesisSupplyMinted, "genesisSupplyAlreadyMinted");
+        genesisSupplyMinted = true;
+        _mint(msg.sender, genesisSupply);// mint 1 time requiered amount for allocation
+        emit DollarMinted(address(this), msg.sender, genesisSupply);
     }
 
     function setTreasuryAddress(address _treasury) public onlyOwner {

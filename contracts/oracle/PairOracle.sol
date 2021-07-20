@@ -6,7 +6,6 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../libs/FixedPoint.sol";
-import "../libs/UQ112x112.sol";
 import "../interfaces/IPairOracle.sol";
 import "../interfaces/IUniswapLP.sol";
 
@@ -14,7 +13,7 @@ contract PairOracle is Ownable, IPairOracle {
     using FixedPoint for *;
     using SafeMath for uint256;
 
-    uint256 public PERIOD = 30; // 60-minute TWAP (time-weighted average price)
+    uint256 public PERIOD = 600; // 10-minute TWAP (time-weighted average price)
 
     IUniswapLP public immutable pair;
     address public immutable token0;
@@ -43,13 +42,12 @@ contract PairOracle is Ownable, IPairOracle {
         PERIOD = _period;
     }
 
-    function update() external override {
-        (uint256 price0Cumulative, uint256 price1Cumulative, uint32 blockTimestamp) =
-            currentCumulativePrices(address(pair));
+    function update() public override {
+        (uint256 price0Cumulative, uint256 price1Cumulative, uint32 blockTimestamp) = currentCumulativePrices(address(pair));
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // Overflow is desired
 
         // Ensure that at least one full period has passed since the last update
-        require(timeElapsed >= PERIOD, "PairOracle: PERIOD_NOT_ELAPSED");
+        require(updateRequiered(), "PairOracle: PERIOD_NOT_ELAPSED");
 
         // Overflow is desired, casting never truncates
         // Cumulative price is in (uq112x112 price * seconds) units so we simply wrap it after division by time elapsed
@@ -58,6 +56,15 @@ contract PairOracle is Ownable, IPairOracle {
         price0CumulativeLast = price0Cumulative;
         price1CumulativeLast = price1Cumulative;
         blockTimestampLast = blockTimestamp;
+    }
+    
+    function updateIfRequiered() external override{
+        if (updateRequiered()) update();
+    }
+    
+    function updateRequiered() public view returns (bool is_update_required){
+        uint32 timeElapsed = uint32(block.timestamp) - blockTimestampLast;
+        return timeElapsed >= PERIOD;
     }
 
     // Note this will always return 0 before update has been called successfully for the first time.
@@ -75,15 +82,11 @@ contract PairOracle is Ownable, IPairOracle {
     }
 
     // produces the cumulative price using counterfactuals to save gas and avoid a call to sync.
-    function currentCumulativePrices(address _pair)
-        internal
-        view
-        returns (
-            uint256 price0Cumulative,
-            uint256 price1Cumulative,
-            uint32 blockTimestamp
-        )
-    {
+    function currentCumulativePrices(address _pair) internal view returns (
+        uint256 price0Cumulative,
+        uint256 price1Cumulative,
+        uint32 blockTimestamp
+    ){
         blockTimestamp = currentBlockTimestamp();
         IUniswapLP uniswapPair = IUniswapLP(_pair);
         price0Cumulative = uniswapPair.price0CumulativeLast();
@@ -95,9 +98,7 @@ contract PairOracle is Ownable, IPairOracle {
             // subtraction overflow is desired
             uint32 timeElapsed = blockTimestamp - _blockTimestampLast;
             // addition overflow is desired
-            // counterfactual
             price0Cumulative += uint256(FixedPoint.fraction(reserve1, reserve0)._x) * timeElapsed;
-            // counterfactual
             price1Cumulative += uint256(FixedPoint.fraction(reserve0, reserve1)._x) * timeElapsed;
         }
     }
