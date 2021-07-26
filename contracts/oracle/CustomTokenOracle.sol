@@ -9,12 +9,12 @@ import "../interfaces/IOracle.sol";
 
 contract CustomTokenOracle is Ownable, IOracle {
     address public customToken;
-    address public oracleCustomTokenCollateral;
-    IPairOracle customToken_collateral;
+    IPairOracle oracleCustomTokenCollateral;
     AggregatorV3Interface public priceFeed;
     uint8 public decimals;
-
     uint256 private constant PRICE_PRECISION = 1e18;
+    
+    event oracleCustomTokenCollateralChanged(IPairOracle _newOracle);
 
     constructor(
         address _customToken,
@@ -22,18 +22,18 @@ contract CustomTokenOracle is Ownable, IOracle {
         address _chainlinkCollateralUsd
     ){
         customToken = _customToken;
-        customToken_collateral = _oracleCustomTokenCollateral;
+        setOracleCustomTokenCollateral(_oracleCustomTokenCollateral);
         priceFeed = AggregatorV3Interface(_chainlinkCollateralUsd);
         decimals = priceFeed.decimals();
     }
 
     function consult() external view override returns (uint256) {
-        uint256 _priceCustomTokenCollateral = customToken_collateral.consult(customToken, PRICE_PRECISION);
+        uint256 _priceCustomTokenCollateral = oracleCustomTokenCollateral.consult(customToken, PRICE_PRECISION);
         return priceCollateralUsd() * _priceCustomTokenCollateral / PRICE_PRECISION;
     }
     
-    function updateIfRequiered() external override{
-        customToken_collateral.updateIfRequiered();
+    function updateIfRequired() external override{
+        oracleCustomTokenCollateral.updateIfRequiered();
     }
 
     function priceCollateralUsd() internal view returns (uint256) {
@@ -41,7 +41,9 @@ contract CustomTokenOracle is Ownable, IOracle {
         return uint256(_price) * PRICE_PRECISION / (uint256(10)**decimals);
     }
 
-    function setOracleCustomTokenCollateral(address _oracleCustomTokenCollateral) external onlyOwner {
+    function setOracleCustomTokenCollateral(IPairOracle _oracleCustomTokenCollateral) public onlyOwner {
+        require(_oracleCustomTokenCollateral != IPairOracle(address(0)), "!pairOracle");
         oracleCustomTokenCollateral = _oracleCustomTokenCollateral;
+        emit oracleCustomTokenCollateralChanged(oracleCustomTokenCollateral);
     }
 }

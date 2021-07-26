@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IDollar.sol";
 import "./interfaces/ITreasury.sol";
-// import "./utilityContracts/ERC20Custom.sol";
 
 contract Dollar is ERC20, IDollar, Ownable {
     address public treasury;
@@ -17,9 +16,9 @@ contract Dollar is ERC20, IDollar, Ownable {
         _;
     }
 
-    event DollarBurned(address indexed from, address indexed to, uint256 amount);// Track DOLLAR burned
-    event DollarMinted(address indexed from, address indexed to, uint256 amount);// Track DOLLAR minted
-    event NewTreasuryAddress(address treasury);// Track treasury address changes
+    event DollarBurned(address indexed from, address indexed to, uint256 amount);
+    event DollarMinted(address indexed from, address indexed to, uint256 amount);
+    event NewTreasuryAddress(address treasury);
 
     constructor(
         string memory _name,  
@@ -32,12 +31,11 @@ contract Dollar is ERC20, IDollar, Ownable {
         setTreasuryAddress(_treasury);
         genesisSupply = _genesisSupply;
     }
-    
-        
+       
     function mintGenesisSupply() external onlyOwner {
         require(!genesisSupplyMinted, "genesisSupplyAlreadyMinted");
         genesisSupplyMinted = true;
-        _mint(msg.sender, genesisSupply);// mint 1 time requiered amount for allocation
+        _mint(msg.sender, genesisSupply);
         emit DollarMinted(address(this), msg.sender, genesisSupply);
     }
 
