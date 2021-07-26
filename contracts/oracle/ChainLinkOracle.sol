@@ -5,12 +5,12 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 //0xAB594600376Ec9fD91F8e885dADF0CE036862dE0 = Wcoin-usd chainlink price feed on polygon
 
 contract ChainLinkOracle{
-    uint256 private pricePrescion;// = 1e6;
+    uint256 private pricePrescion;
     AggregatorV3Interface public priceFeed;
     uint8 public decimals;
     
-    constructor(address _chainlinkWcoinUsd, uint256 _pricePrescion){
-        priceFeed = AggregatorV3Interface(_chainlinkWcoinUsd);
+    constructor(address _chainlinkCollateralUsd, uint256 _pricePrescion){
+        priceFeed = AggregatorV3Interface(_chainlinkCollateralUsd);
         decimals = priceFeed.decimals();
         pricePrescion = _pricePrescion;
     }

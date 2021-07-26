@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.4;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../libs/FixedPoint.sol";
 import "../interfaces/IPairOracle.sol";
 import "../interfaces/IUniswapLP.sol";
 
 contract PairOracle is Ownable, IPairOracle {
     using FixedPoint for *;
-    using SafeMath for uint256;
 
-    uint256 public PERIOD = 600; // 10-minute TWAP (time-weighted average price)
+    uint256 public constant PERIOD = 600; // 10-minute TWAP (time-weighted average price)// New oracle will be deployed if need change this value
 
     IUniswapLP public immutable pair;
     address public immutable token0;
@@ -26,6 +23,7 @@ contract PairOracle is Ownable, IPairOracle {
     FixedPoint.uq112x112 public price1Average;
 
     constructor(address pairAddress) {
+        require(pairAddress!=address(0), "!pairAddress");
         IUniswapLP _pair = IUniswapLP(pairAddress);
         pair = _pair;
         token0 = _pair.token0();
@@ -38,13 +36,9 @@ contract PairOracle is Ownable, IPairOracle {
         require(reserve0 != 0 && reserve1 != 0, "PairOracle: NO_RESERVES"); // Ensure that there's liquidity in the pair
     }
 
-    function setPeriod(uint256 _period) external onlyOwner {
-        PERIOD = _period;
-    }
-
     function update() public override {
         (uint256 price0Cumulative, uint256 price1Cumulative, uint32 blockTimestamp) = currentCumulativePrices(address(pair));
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast; // Overflow is desired
+        uint32 timeElapsed = blockTimestamp - blockTimestampLast;
 
         // Ensure that at least one full period has passed since the last update
         require(updateRequiered(), "PairOracle: PERIOD_NOT_ELAPSED");
@@ -92,12 +86,9 @@ contract PairOracle is Ownable, IPairOracle {
         price0Cumulative = uniswapPair.price0CumulativeLast();
         price1Cumulative = uniswapPair.price1CumulativeLast();
 
-        // if time has elapsed since the last update on the pair, mock the accumulated price values
         (uint112 reserve0, uint112 reserve1, uint32 _blockTimestampLast) = uniswapPair.getReserves();
         if (_blockTimestampLast != blockTimestamp) {
-            // subtraction overflow is desired
             uint32 timeElapsed = blockTimestamp - _blockTimestampLast;
-            // addition overflow is desired
             price0Cumulative += uint256(FixedPoint.fraction(reserve1, reserve0)._x) * timeElapsed;
             price1Cumulative += uint256(FixedPoint.fraction(reserve0, reserve1)._x) * timeElapsed;
         }

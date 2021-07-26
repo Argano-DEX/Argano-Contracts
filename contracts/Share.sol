@@ -23,6 +23,7 @@ contract Share is ERC20Capped, Ownable {
     event ShareBurned(address indexed from, address indexed to, uint256 amount);// Track Share burned
     event ShareMinted(address indexed from, address indexed to, uint256 amount);// Track Share minted
     event NewTreasuryAddress(address treasury);// Track treasury address changes
+    event CommunityRewardsClaimed(address controller, uint256 amount);
 
     constructor(
         string memory _name, 
@@ -39,7 +40,7 @@ contract Share is ERC20Capped, Ownable {
         require(_rewardController != address(0), "badRewardController");
         rewardController = _rewardController;
         setTreasuryAddress(_treasury);
-        communityRewardAllocation = _communityRewardAllocation;//80000000 ether; // 80M
+        communityRewardAllocation = _communityRewardAllocation;
         genesisSupply = _genesisSupply;
     }
     
@@ -53,9 +54,10 @@ contract Share is ERC20Capped, Ownable {
 
     function claimCommunityRewards(uint256 amount) external onlyOwner {
         require(amount > 0, "invalidAmount");
-        require(amount <= ( communityRewardAllocation - communityRewardClaimed ) , "exceedRewards");
+        require(amount <= ( communityRewardAllocation - communityRewardClaimed) , "exceedRewards");
         communityRewardClaimed = communityRewardClaimed + amount;
         _mint(rewardController, amount);
+        emit CommunityRewardsClaimed(rewardController, amount);
     }
 
 
