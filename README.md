@@ -1,5 +1,5 @@
 # Argano-Contracts
-This is our smart-contracts that are situated on Polygon Mainnet
+Argano’s core smart contracts
 
 ### 0001	no	awaiting onchain deployment
 ### 0002	yes	executeTransaction function was removed
