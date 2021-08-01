@@ -38,18 +38,20 @@ contract PairOracle is Ownable, IPairOracle {
 
     function update() public override {
         (uint256 price0Cumulative, uint256 price1Cumulative, uint32 blockTimestamp) = currentCumulativePrices(address(pair));
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast;
+        unchecked{  uint32 timeElapsed = blockTimestamp - blockTimestampLast; }
 
         // Ensure that at least one full period has passed since the last update
         require(updateRequiered(), "PairOracle: PERIOD_NOT_ELAPSED");
 
         // Overflow is desired, casting never truncates
         // Cumulative price is in (uq112x112 price * seconds) units so we simply wrap it after division by time elapsed
-        price0Average = FixedPoint.uq112x112(uint224((price0Cumulative - price0CumulativeLast) / timeElapsed));
-        price1Average = FixedPoint.uq112x112(uint224((price1Cumulative - price1CumulativeLast) / timeElapsed));
-        price0CumulativeLast = price0Cumulative;
-        price1CumulativeLast = price1Cumulative;
-        blockTimestampLast = blockTimestamp;
+        unchecked{
+            price0Average = FixedPoint.uq112x112(uint224((price0Cumulative - price0CumulativeLast) / timeElapsed));
+            price1Average = FixedPoint.uq112x112(uint224((price1Cumulative - price1CumulativeLast) / timeElapsed));
+            price0CumulativeLast = price0Cumulative;
+            price1CumulativeLast = price1Cumulative;
+            blockTimestampLast = blockTimestamp;
+        }
     }
     
     function updateIfRequiered() external override{
@@ -88,9 +90,11 @@ contract PairOracle is Ownable, IPairOracle {
 
         (uint112 reserve0, uint112 reserve1, uint32 _blockTimestampLast) = uniswapPair.getReserves();
         if (_blockTimestampLast != blockTimestamp) {
-            uint32 timeElapsed = blockTimestamp - _blockTimestampLast;
-            price0Cumulative += uint256(FixedPoint.fraction(reserve1, reserve0)._x) * timeElapsed;
-            price1Cumulative += uint256(FixedPoint.fraction(reserve0, reserve1)._x) * timeElapsed;
+            unchecked{  
+                uint32 timeElapsed = blockTimestamp - _blockTimestampLast;
+                price0Cumulative += uint256(FixedPoint.fraction(reserve1, reserve0)._x) * timeElapsed;
+                price1Cumulative += uint256(FixedPoint.fraction(reserve0, reserve1)._x) * timeElapsed;
+            }
         }
     }
 }
