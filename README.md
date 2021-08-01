@@ -7,7 +7,7 @@ Argano’s core smart contracts
 ### 0004	yes	dev fund allocation was completely removed from contracts
 ### 0005	no	awaiting onchain deployment
 ### 0006	yes	oracle updates is implemented
-### 0007	no	tx.origin check is desired. Possible manipulations is allowed.*
+### 0007	no	tx.origin check is desired. Possible manipulations is allowed.* || UPDATED now checks msg.send and ( msg.sender == tx.origin )
 ### 0008	yes	ability to swap "using ECR orTCR" is removed
 ### 0009	yes	add check that block removing active rebalance pool
 ### 0010	yes	modifier notMigrated added
@@ -38,8 +38,13 @@ Argano’s core smart contracts
 ### 0035	no	added in important places (partial)**
 ### 0036	yes	Incorrect safemath conversion is fixed
 ### 0037	yes	setted added
+### 0038	yes	unchecked blocks integrated into code
+### 0039  yes Now Effective Collateral Ratio starts with pause and could be onllt turning on
+### 0040  yes now Buyback and Recollateralize Restricted by Strategist (without timelock)
 
 
 tx.origin check is desired. Possible manipulations is allowed.* - This mean that tx.origin authorisation is best use-case for our vision of discount requirement. We want give discount only for transaction initiators that hold our governance token, not for contracts. If we will use msg.sender insted this is could open opportunities for scammers to create contracts with out token in balance to give users discount and manage their funds. We noticed about patterns when attacker could use tx.origin to call transaction as another user (fallback attack), but this scenario is not dangerous for our protocol economic or users funds. This manipulation could be totally ignored. But, in next versions of protocol we will change this logic to acheive best-case patterns and avoid to use tx.origin totally.
+
+UPDATED now checks msg.send and ( msg.sender == tx.origin )
 
 ** - adding events and zero address check is required hight amount of events. We will restrict amount of setters in next version of protocol. 
