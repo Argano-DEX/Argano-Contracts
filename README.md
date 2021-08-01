@@ -19,7 +19,7 @@ Argano’s core smart contracts
 ### 0016	yes	local copies was removed
 ### 0017	no	local copies desired
 ### 0018	yes	<add events> 
-### 0019	no	<add events>**
+### 0019	added some events and zero addresses cheks
 ### 0020	yes	Multiple Deployable Contract was separated into different files
 ### 0021	no	awaiting onchain deployment/ we awaiting token sale requirenments
 ### 0022	yes	ABIv2Encoder removed. Safe math removed
@@ -47,4 +47,4 @@ tx.origin check is desired. Possible manipulations is allowed.* - This mean that
 
 UPDATED now checks msg.send and ( msg.sender == tx.origin )
 
-** - adding events and zero address check is required hight amount of events. We will restrict amount of setters in next version of protocol. 
+** - || UPDATED added some events and zero addresses cheks
