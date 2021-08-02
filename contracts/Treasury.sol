@@ -310,7 +310,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         }
     }
 
-    function buyback(uint256 _collateral_value, uint256 _min_share_amount) external onlyOwner withOracleUpdates notMigrated hasRebalancePool checkRebalanceCooldown {
+    function buyback(uint256 _collateral_value, uint256 _min_share_amount) external onlyStrategist withOracleUpdates notMigrated hasRebalancePool checkRebalanceCooldown {
         (uint256 _excess_collateral_value, bool _exceeded) = calcCollateralBalance();
         require(_exceeded && _excess_collateral_value > 0, "!exceeded");
         require(_collateral_value > 0 && _collateral_value < _excess_collateral_value, "invalidCollateralAmount");
@@ -322,7 +322,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         emit BoughtBack(_collateral_value, _collateral_amount_sell, out_share_amount);
     }
 
-    function recollateralize(uint256 _share_amount, uint256 _min_collateral_amount) external onlyOwner withOracleUpdates notMigrated hasRebalancePool checkRebalanceCooldown {
+    function recollateralize(uint256 _share_amount, uint256 _min_collateral_amount) external onlyStrategist withOracleUpdates notMigrated hasRebalancePool checkRebalanceCooldown {
         (uint256 _deficit_collateral_value, bool _exceeded) = calcCollateralBalance();
         require(!_exceeded && _deficit_collateral_value > 0, "exceeded");
         require(_min_collateral_amount <= _deficit_collateral_value, ">deficit");
