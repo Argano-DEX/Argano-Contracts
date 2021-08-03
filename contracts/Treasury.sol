@@ -153,9 +153,9 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
     function nextEpochPoint() public view override returns (uint256) {return lastEpochTime + epoch_length;}
     function epoch() public view override returns (uint256) {return _epoch;}
 
-    function redemption_fee_adjusted() public view returns (uint256 redemptionFee) {
+    function redemption_fee_adjusted(address _caller) public view returns (uint256 redemptionFee) {
         if (governanceToken == address(0)) return redemption_fee;
-        if (IERC20(governanceToken).balanceOf(msg.sender) >= discount_requirenment() && tx.origin == msg.sender ) return redemption_fee / 2;
+        if (IERC20(governanceToken).balanceOf(_caller) >= discount_requirenment()) return redemption_fee / 2;
         return redemption_fee;
     }
 
@@ -166,8 +166,7 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         return  gov_token_value_for_discount * PRICE_PRECISION * 10**decimals / govTokenPrice;
     }
 
-    function info() external view override returns (
-        uint256,
+    function info(address _caller) external view override returns (
         uint256,
         uint256,
         uint256,
@@ -179,12 +178,11 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         return (
             dollarPrice(), 
             sharePrice(), 
-            IERC20(dollar).totalSupply(), 
             target_collateral_ratio, 
             effective_collateral_ratio, 
             globalCollateralValue(),    
             minting_fee, 
-            redemption_fee_adjusted()
+            redemption_fee_adjusted(_caller)
         );
     }
 
