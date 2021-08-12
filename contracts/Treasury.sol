@@ -342,9 +342,12 @@ contract Treasury is ITreasury, Ownable, ReentrancyGuard {
         (uint256 _excess_collateral_value, bool _exceeded) = calcCollateralBalance();
         uint256 _allocation_value = 0;
         if (_exceeded) {
-            _allocation_value = _excess_collateral_value * excess_collateral_distributed_ratio / RATIO_PRECISION;
+            uint256 missing_decimals = IPool(rebalancing_pool).getMissing_decimals();
             uint256 collateral_price = IPool(rebalancing_pool).getCollateralPrice();
-            uint256 _allocation_amount = _allocation_value * PRICE_PRECISION / collateral_price;
+
+            _allocation_value = _excess_collateral_value * excess_collateral_distributed_ratio / RATIO_PRECISION;
+            uint256 _allocation_amount = _allocation_value * PRICE_PRECISION / (collateral_price * (10 ** missing_decimals));
+
             IPool(rebalancing_pool).transferCollateralToTreasury(_allocation_amount); // Transfer collateral from pool to treasury
             IERC20(rebalancing_pool_collateral).safeApprove(foundry, 0);
             IERC20(rebalancing_pool_collateral).safeApprove(foundry, _allocation_amount);
